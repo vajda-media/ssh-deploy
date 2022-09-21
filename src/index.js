@@ -66,21 +66,54 @@ const sshDeploy = (() => {
       const privateKey = addSshKey(privateKeyContent, DEPLOY_KEY_NAME || "deploy_key");
       const remoteDest = `${username}@${host}:${dest}`;
 
-      rsync({ privateKey, port, src, dest: remoteDest, args, exclude, fromEnv, toEnv });
+      rsync({ privateKey, port, src, dest: remoteDest, args, exclude });
     });
-  };
-
-  const copyFile = () => {
-    console.log(`✅ [cpSync] check files is existing 1: ${ENV} 2: ${TARGET}`);
-    if (ENV) {
-      console.log(`✅ [cpSync] copy .env file to root dir from: ${ENV} to: ${TARGET}`);
-      console.log("✅ [cpSync] finished.", cpSync(FROM_ENV, TO_ENV));
-    }
   };
 
   return {
     init,
-    copyFile,
+  };
+})();
+
+const copyFile = (() => {
+  const rsync = ({ src, dest }) => {
+    console.log(`[CpSync] Starting CpSync Action: ${src} to ${dest}`);
+
+    try {
+      // RSYNC COMMAND
+      nodeRsync(
+        {
+          src,
+          dest,
+        },
+        (error, stdout, stderr, cmd) => {
+          if (error) {
+            console.error("⚠️ [CpSync] error: ", error.message);
+            console.log("⚠️ [CpSync] stderr: ", stderr);
+            console.log("⚠️ [CpSync] stdout: ", stdout);
+            console.log("⚠️ [CpSync] cmd: ", cmd);
+            process.abort();
+          } else {
+            console.log("✅ [CpSync] finished.", stdout);
+          }
+        }
+      );
+    } catch (err) {
+      console.error("⚠️ [CpSync] command error: ", err.message, err.stack);
+      process.abort();
+    }
+  };
+
+  const init = ({ src, dest }) => {
+    validateRsync(() => {
+      const remoteDest = `${username}@${host}:${dest}`;
+
+      rsync({ src, dest: remoteDest });
+    });
+  };
+
+  return {
+    init,
   };
 })();
 
@@ -96,6 +129,11 @@ const run = () => {
     username: REMOTE_USER,
     privateKeyContent: SSH_PRIVATE_KEY,
     exclude: (EXCLUDE || "").split(",").map((item) => item.trim()), // split by comma and trim whitespace
+  });
+
+  copyFile.init({
+    src: ENV,
+    dest: TARGET || `/home/${REMOTE_USER}/`,
   });
 };
 

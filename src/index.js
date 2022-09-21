@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const nodeRsync = require("rsyncwrapper");
-
+const { cpSync } = require("fs");
 const { validateRsync, validateInputs } = require("./rsyncCli");
 const { addSshKey } = require("./sshKey");
 
@@ -79,7 +79,7 @@ const sshDeploy = (() => {
       const remoteDest = `${username}@${host}:${dest}`;
 
       rsync({ privateKey, port, src, dest: remoteDest, args, exclude });
-      copyFile(fromEnv, toEnv);
+      cpSync(fromEnv, toEnv);
     });
   };
 

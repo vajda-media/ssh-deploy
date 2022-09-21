@@ -15,8 +15,7 @@ const {
   ARGS,
   EXCLUDE,
   GITHUB_WORKSPACE,
-  FROM_ENV,
-  TO_ENV,
+  ENV,
 } = require("./inputs");
 
 const defaultOptions = {
@@ -31,6 +30,10 @@ const sshDeploy = (() => {
   const rsync = ({ privateKey, port, src, dest, args, exclude }) => {
     console.log(`[Rsync] Starting Rsync Action: ${src} to ${dest}`);
     if (exclude) console.log(`[Rsync] exluding folders ${exclude}`);
+    if (ENV) {
+      console.log(`✅ [Rsync] copy .env file to root dir from: ${ENV} to: ${TARGET}`);
+      console.log("✅ [Rsync] finished.", cpSync(FROM_ENV, TO_ENV));
+    }
 
     try {
       // RSYNC COMMAND
@@ -52,8 +55,7 @@ const sshDeploy = (() => {
             console.log("⚠️ [Rsync] cmd: ", cmd);
             process.abort();
           } else {
-            console.log("✅ [Rsync] finished.", /*stdout*/ cpSync(FROM_ENV, TO_ENV));
-            console.log(`✅ [Rsync] copy .env file to root dir from: ${FROM_ENV} to: ${TO_ENV}`);
+            console.log("✅ [Rsync] finished.", stdout);
           }
         }
       );
@@ -78,7 +80,7 @@ const sshDeploy = (() => {
 })();
 
 const run = () => {
-  validateInputs({ SSH_PRIVATE_KEY, REMOTE_HOST, REMOTE_USER, FROM_ENV, TO_ENV });
+  validateInputs({ SSH_PRIVATE_KEY, REMOTE_HOST, REMOTE_USER });
 
   sshDeploy.init({
     src: `${GITHUB_WORKSPACE}/${SOURCE || ""}`,

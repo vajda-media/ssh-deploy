@@ -8,8 +8,7 @@ const inputNames = [
   "TARGET",
   "ARGS",
   "EXCLUDE",
-  "FROM_ENV",
-  "TO_ENV",
+  "ENV",
 ];
 
 const inputs = {

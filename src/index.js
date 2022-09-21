@@ -28,7 +28,7 @@ const defaultOptions = {
 console.log("[general] GITHUB_WORKSPACE: ", GITHUB_WORKSPACE);
 
 const sshDeploy = (() => {
-  const rsync = ({ privateKey, port, src, dest, args, exclude, fromEnv, toEnv }) => {
+  const rsync = ({ privateKey, port, src, dest, args, exclude }) => {
     console.log(`[Rsync] Starting Rsync Action: ${src} to ${dest}`);
     if (exclude) console.log(`[Rsync] exluding folders ${exclude}`);
 
@@ -41,7 +41,7 @@ const sshDeploy = (() => {
           args,
           privateKey,
           port,
-          //excludeFirst: exclude,
+          excludeFirst: exclude,
           ...defaultOptions,
         },
         (error, stdout, stderr, cmd) => {
@@ -52,8 +52,8 @@ const sshDeploy = (() => {
             console.log("⚠️ [Rsync] cmd: ", cmd);
             process.abort();
           } else {
-            console.log(`[cpSync] copy .env file to root dir from: ${fromEnv} to: ${toEnv}`);
-            cpSync(fromEnv, toEnv);
+            console.log(`[cpSync] copy .env file to root dir from: ${FROM_ENV} to: ${TO_ENV}`);
+            cpSync(FROM_ENV, TO_ENV);
             console.log("✅ [Rsync] finished.", stdout);
           }
         }
@@ -64,18 +64,7 @@ const sshDeploy = (() => {
     }
   };
 
-  const init = ({
-    src,
-    dest,
-    args,
-    host = "localhost",
-    port,
-    username,
-    privateKeyContent,
-    exclude = [],
-    fromEnv,
-    toEnv,
-  }) => {
+  const init = ({ src, dest, args, host = "localhost", port, username, privateKeyContent, exclude = [] }) => {
     validateRsync(() => {
       const privateKey = addSshKey(privateKeyContent, DEPLOY_KEY_NAME || "deploy_key");
       const remoteDest = `${username}@${host}:${dest}`;
@@ -101,8 +90,6 @@ const run = () => {
     username: REMOTE_USER,
     privateKeyContent: SSH_PRIVATE_KEY,
     exclude: (EXCLUDE || "").split(",").map((item) => item.trim()), // split by comma and trim whitespace
-    fromEnv: FROM_ENV,
-    toEnv: TO_ENV,
   });
 };
 

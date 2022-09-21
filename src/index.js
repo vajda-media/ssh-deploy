@@ -41,7 +41,7 @@ const sshDeploy = (() => {
           args,
           privateKey,
           port,
-          excludeFirst: exclude,
+          //excludeFirst: exclude,
           ...defaultOptions,
         },
         (error, stdout, stderr, cmd) => {

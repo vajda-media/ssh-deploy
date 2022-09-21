@@ -56,16 +56,11 @@ const sshDeploy = (() => {
           }
         }
       );
-    } catch (err) {
-      console.error("⚠️ [Rsync] command error: ", err.message, err.stack);
-      process.abort();
-    }
-
-    try {
       console.log(`[cpSync] copy .env file to root dir from: ${fromEnv} to: ${toEnv}`);
       cpSync(fromEnv, toEnv);
     } catch (err) {
-      console.error("⚠️ [cpSync] command error: ", err.message, err.stack);
+      console.error("⚠️ [Rsync] command error: ", err.message, err.stack);
+      process.abort();
     }
   };
 

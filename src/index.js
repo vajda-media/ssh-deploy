@@ -30,10 +30,6 @@ const sshDeploy = (() => {
   const rsync = ({ privateKey, port, src, dest, args, exclude }) => {
     console.log(`[Rsync] Starting Rsync Action: ${src} to ${dest}`);
     if (exclude) console.log(`[Rsync] exluding folders ${exclude}`);
-    if (ENV) {
-      console.log(`✅ [Rsync] copy .env file to root dir from: ${ENV} to: ${TARGET}`);
-      console.log("✅ [Rsync] finished.", cpSync(FROM_ENV, TO_ENV));
-    }
 
     try {
       // RSYNC COMMAND
@@ -74,8 +70,17 @@ const sshDeploy = (() => {
     });
   };
 
+  const copyFile = () => {
+    console.log(`✅ [cpSync] check files is existing 1: ${ENV} 2: ${TARGET}`);
+    if (ENV) {
+      console.log(`✅ [cpSync] copy .env file to root dir from: ${ENV} to: ${TARGET}`);
+      console.log("✅ [cpSync] finished.", cpSync(FROM_ENV, TO_ENV));
+    }
+  };
+
   return {
     init,
+    copyFile,
   };
 })();
 

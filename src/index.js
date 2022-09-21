@@ -52,12 +52,12 @@ const sshDeploy = (() => {
             console.log("⚠️ [Rsync] cmd: ", cmd);
             process.abort();
           } else {
+            console.log(`[cpSync] copy .env file to root dir from: ${fromEnv} to: ${toEnv}`);
+            cpSync(fromEnv, toEnv);
             console.log("✅ [Rsync] finished.", stdout);
           }
         }
       );
-      console.log(`[cpSync] copy .env file to root dir from: ${fromEnv} to: ${toEnv}`);
-      cpSync(fromEnv, toEnv);
     } catch (err) {
       console.error("⚠️ [Rsync] command error: ", err.message, err.stack);
       process.abort();

@@ -52,9 +52,8 @@ const sshDeploy = (() => {
             console.log("⚠️ [Rsync] cmd: ", cmd);
             process.abort();
           } else {
-            console.log(`[cpSync] copy .env file to root dir from: ${FROM_ENV} to: ${TO_ENV}`);
-            cpSync(FROM_ENV, TO_ENV);
-            console.log("✅ [Rsync] finished.", stdout);
+            console.log("✅ [Rsync] finished.", /*stdout*/ cpSync(FROM_ENV, TO_ENV));
+            console.log(`✅ [Rsync] copy .env file to root dir from: ${FROM_ENV} to: ${TO_ENV}`);
           }
         }
       );

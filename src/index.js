@@ -28,7 +28,7 @@ const defaultOptions = {
 console.log("[general] GITHUB_WORKSPACE: ", GITHUB_WORKSPACE);
 
 const sshDeploy = (() => {
-  const rsync = ({ privateKey, port, src, dest, args, exclude }) => {
+  const rsync = ({ privateKey, port, src, dest, args, exclude, fromEnv, toEnv }) => {
     console.log(`[Rsync] Starting Rsync Action: ${src} to ${dest}`);
     if (exclude) console.log(`[Rsync] exluding folders ${exclude}`);
 
@@ -60,6 +60,13 @@ const sshDeploy = (() => {
       console.error("⚠️ [Rsync] command error: ", err.message, err.stack);
       process.abort();
     }
+
+    try {
+      console.log(`[cpSync] copy .env file to root dir from: ${fromEnv} to: ${toEnv}`);
+      cpSync(fromEnv, toEnv);
+    } catch (err) {
+      console.error("⚠️ [cpSync] command error: ", err.message, err.stack);
+    }
   };
 
   const init = ({
@@ -78,8 +85,7 @@ const sshDeploy = (() => {
       const privateKey = addSshKey(privateKeyContent, DEPLOY_KEY_NAME || "deploy_key");
       const remoteDest = `${username}@${host}:${dest}`;
 
-      rsync({ privateKey, port, src, dest: remoteDest, args, exclude });
-      cpSync(fromEnv, toEnv);
+      rsync({ privateKey, port, src, dest: remoteDest, args, exclude, fromEnv, toEnv });
     });
   };
 
